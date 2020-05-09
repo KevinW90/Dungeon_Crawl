@@ -8,8 +8,8 @@ class Tile extends Component {
     
     render() {
         const styles = {
-            top: this.props.x,
-            left: this.props.y
+            top: this.props.y,
+            left: this.props.x
         }
 
         return (

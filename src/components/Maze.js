@@ -24,6 +24,7 @@ class Maze extends Component {
             let maze = document.querySelector('#maze');
             let maze_w = maze.offsetWidth;
             let maze_h = maze.offsetHeight;
+            console.log(maze);
 
             //finding random points within game dimensions
             randomPoint.x = Math.floor(Math.random() * maze_w) + 1;
@@ -41,7 +42,12 @@ class Maze extends Component {
                 this.tileData.push(this.RandomStartPoint());
                 console.log(this.tileData[0])
             } else {
-                let prevTileData = '';
+                let prevTileData = this.tileData[ndx - 1];
+                let newTileData = {};
+                newTileData.x = prevTileData.x;
+                newTileData.y = prevTileData.y + 50;
+
+                this.tileData.push(newTileData);
             }
         }
     } //</constuctor>
