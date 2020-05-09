@@ -13,8 +13,10 @@ class Maze extends Component {
             numTiles: 5
         }
 
-        //tile array
+        //tile data array
         this.tileData = [];
+        //direction array
+        this.directions = ['n','s','e','w'];
 
         this.RandomStartPoint = () => {
             //returning object
@@ -24,7 +26,6 @@ class Maze extends Component {
             let maze = document.querySelector('#maze');
             let maze_w = maze.offsetWidth;
             let maze_h = maze.offsetHeight;
-            console.log(maze);
 
             //finding random points within game dimensions
             randomPoint.x = Math.floor(Math.random() * maze_w) + 1;
@@ -40,15 +41,46 @@ class Maze extends Component {
             if (ndx === 0) {
                 //create master tile data-set
                 this.tileData.push(this.RandomStartPoint());
-                console.log(this.tileData[0])
             } else {
+                let dir = this.ChooseTileDirection();
                 let prevTileData = this.tileData[ndx - 1];
-                let newTileData = {};
-                newTileData.x = prevTileData.x;
-                newTileData.y = prevTileData.y + 50;
+                
+                //set tile data from direction
+                let xoff, yoff;
+                switch (dir) {
+                    case "n":
+                        xoff = 0;
+                        yoff = -50; 
+                        break;
+                    case "e":
+                        xoff = 50; 
+                        yoff = 0;
+                        break;
+                    case "s":
+                        xoff = 0;
+                        yoff = 50; 
+                        break;
+                    case "w":
+                        xoff = -50; 
+                        yoff = 0;
+                        break;
+                    default:
+                        xoff = null;
+                        yoff = null;
+                }
+
+                let newTileData = {x: prevTileData.x + xoff, 
+                                   y: prevTileData.y + yoff};
 
                 this.tileData.push(newTileData);
             }
+        }
+
+        //choose a direction in which to add new tile data
+        this.ChooseTileDirection = () => {
+            let dirSlot = Math.floor(Math.random() * 4);
+            console.log(this.directions[dirSlot]);
+            return this.directions[dirSlot];
         }
     } //</constuctor>
 
@@ -60,6 +92,8 @@ class Maze extends Component {
         this.setState({
             render: !this.state.rerender
         })
+
+        console.log(this.tileData);
     }
 
     render() {
