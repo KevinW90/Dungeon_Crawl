@@ -9,26 +9,25 @@ class Maze extends Component {
 
         this.state = {
             isGameOver: false,
-            mode: '',
-            width: 0,
-            height: 0
+            mode: ''
         }
 
-        //number of tiles
-        this.numtiles = 0; //set from componentDidMount
-        //tile data array
-        this.tileData = [];
-        //direction array
-        this.directions = ['n','s','e','w'];
-        //game dimensions
+        //number of tiles (set from DidMount)
+        this.numtiles = 0;
+        //game dimensions (set from DidMount)
         this.maze = '';
         this.maze_w = '';
         this.maze_h = '';
+        //tile size (set from DidMount)
+        this.tileSize = 0;
+        //tile data array (set from AddTileData)
+        this.tileData = [];
+        //direction array
+        this.directions = ['n','s','e','w'];
+        
 
         //random number generator [min, max]
         this.RNG = (min,max) => {
-            min = Math.ceil(min);
-            max = Math.floor(max);
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
@@ -58,22 +57,22 @@ class Maze extends Component {
                 let dir = this.ChooseTileDirection();
                 prevTileData = this.tileData[ndx - 1];
                     
-                //set tile data from direction
+                //set directional offsets
                 switch (dir) {
                     case "n":
                         xoff = 0;
-                        yoff = -50; 
+                        yoff = -this.tileSize; 
                         break;
                     case "e":
-                        xoff = 50; 
+                        xoff = this.tileSize; 
                         yoff = 0;
                         break;
                     case "s":
                         xoff = 0;
-                        yoff = 50; 
+                        yoff = this.tileSize; 
                         break;
                     case "w":
-                        xoff = -50; 
+                        xoff = -this.tileSize; 
                         yoff = 0;
                         break;
                     default:
@@ -82,6 +81,7 @@ class Maze extends Component {
                 }
             }
 
+            //set tile data
             let newTileData = {x: prevTileData.x + xoff, 
                                y: prevTileData.y + yoff}
             return newTileData;
@@ -95,7 +95,8 @@ class Maze extends Component {
                 
                 //data creation counter to limit attempts due to blockages
                 let creationCounter = 1;
-                while (this.TileDataExists(newTileData) || this.TileIsOffScreen(newTileData)) {
+                while (this.TileDataExists(newTileData) || 
+                       this.TileIsOffScreen(newTileData)) {
                     creationCounter++; //increase creation counter
                     //if creation counter > 6
                     if (creationCounter > 6) {
@@ -135,25 +136,28 @@ class Maze extends Component {
 
         this.TileIsOffScreen = (newTileData) => {
             return (newTileData.x < 0 ||
-                    newTileData.x > this.maze_w - 50 ||
+                    newTileData.x > this.maze_w - this.tileSize ||
                     newTileData.y < 0 ||
-                    newTileData.y > this.maze_h - 50);
+                    newTileData.y > this.maze_h - this.tileSize);
         }
 
         this.AddWalls = () => {
             for (let i = 0; i < this.tileData.length; i++) {
                 let t = this.tileData[i];
 
-                let tn = { x: t.x, y: t.y - 50};
-                let te = { x: t.x + 50, y: t.y};
-                let ts = { x: t.x, y: t.y + 50};
-                let tw = { x: t.x - 50, y: t.y};
+                //tile neighbor set
+                let tn = { x: t.x, y: t.y - this.tileSize};
+                let te = { x: t.x + this.tileSize, y: t.y};
+                let ts = { x: t.x, y: t.y + this.tileSize};
+                let tw = { x: t.x - this.tileSize, y: t.y};
 
+                //check if neighbor exists
                 let n = (this.TileDataExists(tn)) ? false : true;
                 let e = (this.TileDataExists(te)) ? false : true;
                 let s = (this.TileDataExists(ts)) ? false : true;
                 let w = (this.TileDataExists(tw)) ? false : true;
 
+                //add 'walls' object to the tile data
                 t.w = {n, e, s, w};
             }
         }
@@ -164,12 +168,24 @@ class Maze extends Component {
         this.maze = document.querySelector('#maze');
         this.maze_w = this.maze.offsetWidth;
         this.maze_h = this.maze.offsetHeight;
+        console.log(this.maze_w);
+        console.log(this.maze_h);
 
-        let maxTilesHor = Math.floor(this.maze_w / 50);
-        let maxTilesVer = Math.floor(this.maze_h / 50);
+        //tile size based on maze width (screen width)
+        if (this.maze_w >= 1200) this.tileSize = 50;
+        else if (this.maze_w >= 768) this.tileSize = 40;
+        else if (this.maze_w >= 600) this.tileSize = 25;
+        else this.tileSize = 20;
+
+        console.log(this.tileSize);
+
+        let maxTilesHor = Math.floor(this.maze_w / this.tileSize);
+        let maxTilesVer = Math.floor(this.maze_h / this.tileSize);
         this.numTiles = Math.floor((maxTilesHor * maxTilesVer) * .65);
-
         console.log(this.numTiles);
+        console.log(maxTilesHor);
+        console.log(maxTilesVer);
+
 
         this.AddTileData();
         
@@ -183,7 +199,8 @@ class Maze extends Component {
                 {this.tileData.map( (t, index) => {
                     return( <Tile x={t.x} 
                                   y={t.y} 
-                                  n={index} 
+                                  width={this.tileSize}
+                                  height={this.tileSize} 
                                   walls={t.w}
                                   key={`t${index}`} /> )
                 })}

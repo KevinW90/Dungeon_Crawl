@@ -15,7 +15,9 @@ const Tile = (props) => {
         borderTop: border_t, 
         borderRight: border_r, 
         borderBottom: border_b, 
-        borderLeft: border_l, 
+        borderLeft: border_l,
+        width: props.width,
+        height: props.height
     }
     
     return (
