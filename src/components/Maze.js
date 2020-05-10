@@ -10,13 +10,19 @@ class Maze extends Component {
         this.state = {
             isGameOver: false,
             numTiles: 200,
-            mode: ''
+            mode: '',
+            width: '',
+            height: ''
         }
 
         //tile data array
         this.tileData = [];
         //direction array
         this.directions = ['n','s','e','w'];
+        //game dimensions
+        this.maze = '';
+        this.maze_w = '';
+        this.maze_h = '';
 
         //random number generator [min, max]
         this.RNG = (min,max) => {
@@ -29,14 +35,10 @@ class Maze extends Component {
             //returning object
             let randomPoint = {};
 
-            //game dimensions
-            let maze = document.querySelector('#maze');
-            let maze_w = maze.offsetWidth;
-            let maze_h = maze.offsetHeight;
 
             //finding random points within game dimensions
-            randomPoint.x = this.RNG(0,maze_w);
-            randomPoint.y = this.RNG(0,maze_h);
+            randomPoint.x = this.RNG(0,this.maze_w);
+            randomPoint.y = this.RNG(0,this.maze_h);
 
             //return randomPoint
             return randomPoint;
@@ -80,7 +82,7 @@ class Maze extends Component {
             }
 
             let newTileData = {x: prevTileData.x + xoff, 
-                                y: prevTileData.y + yoff}
+                               y: prevTileData.y + yoff}
             return newTileData;
         }
 
@@ -133,21 +135,20 @@ class Maze extends Component {
         }
 
         this.TileIsOffScreen = (newTileData) => {
-            //game dimensions
-            let maze = document.querySelector('#maze');
-            let maze_w = maze.offsetWidth;
-            let maze_h = maze.offsetHeight;
-
             return (newTileData.x < 0 ||
-                    newTileData.x > maze_w - 50 ||
+                    newTileData.x > this.maze_w - 50 ||
                     newTileData.y < 0 ||
-                    newTileData.y > maze_h - 50);
+                    newTileData.y > this.maze_h - 50);
         }
     } //</constuctor>
 
     componentDidMount = () => {
+        //game dimensions
+        this.maze = document.querySelector('#maze');
+        this.maze_w = this.maze.offsetWidth;
+        this.maze_h = this.maze.offsetHeight;
         this.AddTileData();
-        this.forceUpdate();
+        this.forceUpdate(); //shows tiles
         console.log(this.tileData);
     }
 
