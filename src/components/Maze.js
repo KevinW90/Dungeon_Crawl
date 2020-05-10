@@ -9,12 +9,13 @@ class Maze extends Component {
 
         this.state = {
             isGameOver: false,
-            numTiles: 200,
             mode: '',
-            width: '',
-            height: ''
+            width: 0,
+            height: 0
         }
 
+        //number of tiles
+        this.numtiles = 0; //set from componentDidMount
         //tile data array
         this.tileData = [];
         //direction array
@@ -88,7 +89,7 @@ class Maze extends Component {
 
         this.AddTileData = () => {
             //for numTiles times
-            for (let i = 0; i < this.state.numTiles; i++) {
+            for (let i = 0; i < this.numTiles; i++) {
                 //create new tile data
                 let newTileData = this.CreateTileData(i);
                 
@@ -98,10 +99,8 @@ class Maze extends Component {
                     creationCounter++; //increase creation counter
                     //if creation counter > 6
                     if (creationCounter > 6) {
-                        console.log('creationCounter error');
                         //create new tile data from a random tile data
                         let randomTile = this.RNG(0,this.tileData.length - 1);
-                        console.log(`on ${i} from ${randomTile}`);
                         //add 1 because CreateTileData() subtracts 1
                         newTileData = this.CreateTileData(randomTile + 1);
                     } else {
@@ -166,10 +165,15 @@ class Maze extends Component {
         this.maze_w = this.maze.offsetWidth;
         this.maze_h = this.maze.offsetHeight;
 
+        let maxTilesHor = Math.floor(this.maze_w / 50);
+        let maxTilesVer = Math.floor(this.maze_h / 50);
+        this.numTiles = Math.floor((maxTilesHor * maxTilesVer) * .65);
+
+        console.log(this.numTiles);
+
         this.AddTileData();
         
         this.forceUpdate(); //shows tiles
-        console.log(this.tileData);
         this.AddWalls();
     }
 
