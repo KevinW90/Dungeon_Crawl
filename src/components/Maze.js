@@ -8,15 +8,21 @@ class Maze extends Component {
         super(props);
 
         this.state = {
-            rerender: false, //re render to show maze, actual value does not matter
             isGameOver: false,
-            numTiles: 5
+            numTiles: 50
         }
 
         //tile data array
         this.tileData = [];
         //direction array
         this.directions = ['n','s','e','w'];
+
+        //random number generator [min, max]
+        this.RNG = (min,max) => {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
         this.RandomStartPoint = () => {
             //returning object
@@ -28,8 +34,8 @@ class Maze extends Component {
             let maze_h = maze.offsetHeight;
 
             //finding random points within game dimensions
-            randomPoint.x = Math.floor(Math.random() * maze_w) + 1;
-            randomPoint.y = Math.floor(Math.random() * maze_h) + 1;
+            randomPoint.x = this.RNG(0,maze_w);
+            randomPoint.y = this.RNG(0,maze_h);
 
             //return randomPoint
             return randomPoint;
@@ -37,16 +43,18 @@ class Maze extends Component {
 
         //create a single tile data-set
         this.CreateTileData = (ndx) => {
-            //create master tile data
+            let prevTileData;
+            let xoff, yoff;
+            
             if (ndx === 0) {
-                //create master tile data-set
-                this.tileData.push(this.RandomStartPoint());
+                prevTileData = this.RandomStartPoint();
+                xoff = 0;
+                yoff = 0;
             } else {
                 let dir = this.ChooseTileDirection();
-                let prevTileData = this.tileData[ndx - 1];
-                
+                prevTileData = this.tileData[ndx - 1];
+                    
                 //set tile data from direction
-                let xoff, yoff;
                 switch (dir) {
                     case "n":
                         xoff = 0;
@@ -68,32 +76,62 @@ class Maze extends Component {
                         xoff = null;
                         yoff = null;
                 }
-
-                let newTileData = {x: prevTileData.x + xoff, 
-                                   y: prevTileData.y + yoff};
-
-                this.tileData.push(newTileData);
             }
+
+            let newTileData = {x: prevTileData.x + xoff, 
+                                y: prevTileData.y + yoff}
+            return newTileData;
         }
 
+        this.AddTileData = () => {
+            for (let i = 0; i < this.state.numTiles; i++) {
+                let newTileData = this.CreateTileData(i);
+                if (i === 0) {
+                    this.tileData.push(newTileData);
+                } else {
+                    //data creation counter to limit attempts due to blockages
+                    let creationCounter = 1;
+                    while (this.TileDataExists(newTileData)) {
+                        creationCounter++; //increase creation counter
+                        //if creation counter > 6
+                        if (creationCounter > 6) {
+                            //create new tile data from random tile data
+                            let randomTile = this.RNG(0,this.tileData.length);
+                            newTileData = this.CreateTileData(randomTile);
+                        } else {
+                            newTileData = this.CreateTileData(i);
+                        }
+                    }
+                    this.tileData.push(newTileData);
+                }
+            }
+        }
+        
         //choose a direction in which to add new tile data
         this.ChooseTileDirection = () => {
-            let dirSlot = Math.floor(Math.random() * 4);
-            console.log(this.directions[dirSlot]);
+            let dirSlot = this.RNG(0,4);
             return this.directions[dirSlot];
+        }
+
+        this.TileDataExists = (newTileData) => {
+            //for every tile data
+            for (let i = 0; i < this.tileData.length; i++) {
+                let t = this.tileData[i];
+                //check the new tile data
+                if (newTileData.x === t.x && newTileData.y === t.y) {
+                    //new tile data exists
+                    return true;
+                }
+            }
+
+            //new tile data does not exist
+            return false;
         }
     } //</constuctor>
 
     componentDidMount = () => {
-        for (let i = 0; i < this.state.numTiles; i++) {
-            this.CreateTileData(i);
-        }
-
-        this.setState({
-            render: !this.state.rerender
-        })
-
-        console.log(this.tileData);
+        this.AddTileData();
+        this.forceUpdate();
     }
 
     render() {
