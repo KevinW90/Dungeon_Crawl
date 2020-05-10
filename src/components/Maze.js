@@ -140,6 +140,24 @@ class Maze extends Component {
                     newTileData.y < 0 ||
                     newTileData.y > this.maze_h - 50);
         }
+
+        this.AddWalls = () => {
+            for (let i = 0; i < this.tileData.length; i++) {
+                let t = this.tileData[i];
+
+                let tn = { x: t.x, y: t.y - 50};
+                let te = { x: t.x + 50, y: t.y};
+                let ts = { x: t.x, y: t.y + 50};
+                let tw = { x: t.x - 50, y: t.y};
+
+                let n = (this.TileDataExists(tn)) ? false : true;
+                let e = (this.TileDataExists(te)) ? false : true;
+                let s = (this.TileDataExists(ts)) ? false : true;
+                let w = (this.TileDataExists(tw)) ? false : true;
+
+                t.w = {n, e, s, w};
+            }
+        }
     } //</constuctor>
 
     componentDidMount = () => {
@@ -147,9 +165,12 @@ class Maze extends Component {
         this.maze = document.querySelector('#maze');
         this.maze_w = this.maze.offsetWidth;
         this.maze_h = this.maze.offsetHeight;
+
         this.AddTileData();
+        
         this.forceUpdate(); //shows tiles
         console.log(this.tileData);
+        this.AddWalls();
     }
 
     render() {
@@ -159,6 +180,7 @@ class Maze extends Component {
                     return( <Tile x={t.x} 
                                   y={t.y} 
                                   n={index} 
+                                  walls={t.w}
                                   key={`t${index}`} /> )
                 })}
             </div>

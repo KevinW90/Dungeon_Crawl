@@ -1,23 +1,28 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class Tile extends Component {
-    constructor(props) {
-        super(props);
-    } //</constructor>
+const Tile = (props) => {
+    let border = '1px solid white';
+    let border_t = (props.walls.n) ? border : '';
+    let border_r = (props.walls.e) ? border : '';
+    let border_b = (props.walls.s) ? border : '';
+    let border_l = (props.walls.w) ? border : '';
 
     
-    render() {
-        const styles = {
-            top: this.props.y,
-            left: this.props.x
-        }
 
-        return (
-            <div className="tile" style={styles}>
-                {this.props.n}
-            </div>
-        );
+    const styles = {
+        top: props.y,
+        left: props.x,
+        borderTop: border_t, 
+        borderRight: border_r, 
+        borderBottom: border_b, 
+        borderLeft: border_l, 
     }
-}
+    
+    return (
+        <div className="tile" style={styles}>
+             {props.n}
+        </div>
+    );
+};
 
 export default Tile;
