@@ -9,7 +9,8 @@ class Maze extends Component {
 
         this.state = {
             isGameOver: false,
-            numTiles: 50
+            numTiles: 200,
+            mode: ''
         }
 
         //tile data array
@@ -84,28 +85,31 @@ class Maze extends Component {
         }
 
         this.AddTileData = () => {
+            //for numTiles times
             for (let i = 0; i < this.state.numTiles; i++) {
+                //create new tile data
                 let newTileData = this.CreateTileData(i);
-                if (i === 0) {
-                    this.tileData.push(newTileData);
-                } else {
-                    //data creation counter to limit attempts due to blockages
-                    let creationCounter = 1;
-                    while (this.TileDataExists(newTileData)) {
-                        creationCounter++; //increase creation counter
-                        //if creation counter > 6
-                        if (creationCounter > 6) {
-                            //create new tile data from random tile data
-                            let randomTile = this.RNG(0,this.tileData.length);
-                            newTileData = this.CreateTileData(randomTile);
-                        } else {
-                            newTileData = this.CreateTileData(i);
-                        }
+                
+                //data creation counter to limit attempts due to blockages
+                let creationCounter = 1;
+                while (this.TileDataExists(newTileData) || this.TileIsOffScreen(newTileData)) {
+                    creationCounter++; //increase creation counter
+                    //if creation counter > 6
+                    if (creationCounter > 6) {
+                        console.log('creationCounter error');
+                        //create new tile data from a random tile data
+                        let randomTile = this.RNG(0,this.tileData.length - 1);
+                        console.log(`on ${i} from ${randomTile}`);
+                        //add 1 because CreateTileData() subtracts 1
+                        newTileData = this.CreateTileData(randomTile + 1);
+                    } else {
+                        newTileData = this.CreateTileData(i);
                     }
-                    this.tileData.push(newTileData);
                 }
+                this.tileData.push(newTileData);
             }
         }
+        
         
         //choose a direction in which to add new tile data
         this.ChooseTileDirection = () => {
@@ -127,18 +131,34 @@ class Maze extends Component {
             //new tile data does not exist
             return false;
         }
+
+        this.TileIsOffScreen = (newTileData) => {
+            //game dimensions
+            let maze = document.querySelector('#maze');
+            let maze_w = maze.offsetWidth;
+            let maze_h = maze.offsetHeight;
+
+            return (newTileData.x < 0 ||
+                    newTileData.x > maze_w - 50 ||
+                    newTileData.y < 0 ||
+                    newTileData.y > maze_h - 50);
+        }
     } //</constuctor>
 
     componentDidMount = () => {
         this.AddTileData();
         this.forceUpdate();
+        console.log(this.tileData);
     }
 
     render() {
         return (
             <div id="maze">
                 {this.tileData.map( (t, index) => {
-                    return( <Tile x={t.x} y={t.y} key={`t${index}`} /> )
+                    return( <Tile x={t.x} 
+                                  y={t.y} 
+                                  n={index} 
+                                  key={`t${index}`} /> )
                 })}
             </div>
         );

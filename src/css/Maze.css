@@ -3,5 +3,5 @@
     height: 100vh;
     position: relative;
 
-    overflow: scroll;
+    overflow: hidden;
 }

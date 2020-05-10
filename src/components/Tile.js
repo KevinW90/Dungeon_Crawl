@@ -14,7 +14,7 @@ class Tile extends Component {
 
         return (
             <div className="tile" style={styles}>
-                
+                {this.props.n}
             </div>
         );
     }

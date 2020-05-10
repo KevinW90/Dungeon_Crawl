@@ -4,5 +4,9 @@
 
     position: absolute;
 
-    background: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #555555;
 }
