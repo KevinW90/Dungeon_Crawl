@@ -22,7 +22,7 @@ const Tile = (props) => {
     
     return (
         <div className="tile" style={styles}>
-             {props.n}
+             {`${props.x} , ${props.y}`}
         </div>
     );
 };

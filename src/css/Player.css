@@ -1,0 +1,11 @@
+.player {
+  position: absolute;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+
+  border-radius: 50%;
+  background: blue;
+
+  transition: all .5s ease;
+}

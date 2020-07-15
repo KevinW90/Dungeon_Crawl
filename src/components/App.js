@@ -1,13 +1,13 @@
 import React from 'react';
 import '../css/App.css';
 
-import Maze from './Maze';
+import MazeManager from './MazeManager';
 import '../css/Maze.css';
 
 function App() {
   return (
     <div className="App">
-      <Maze />
+      <MazeManager />
     </div>
   );
 }
