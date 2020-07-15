@@ -1,5 +1,7 @@
 import React from 'react';
 
+import '../css/Tile.css';
+
 const Tile = (props) => {
     let border = '1px solid white';
     let border_t = (props.walls.n) ? border : '';

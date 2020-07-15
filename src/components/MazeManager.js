@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
 
 import Tile from './Tile';
-import '../css/Tile.css';
+// import Maze from './Maze';
+import Player from './Player';
 
-class Maze extends Component {
+class MazeManager extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-        isGameOver: false,
-        mode: ''
+      //playerPos
+      pos: {
+        x: 0,
+        y: 0
+      }
     }
 
     //number of tiles (set from DidMount)
@@ -24,7 +28,7 @@ class Maze extends Component {
     this.tileData = [];
     //direction array
     this.directions = ['n','s','e','w'];
-
+    
     //random number generator [min, max]
     this.RNG = (min,max) => {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -38,6 +42,8 @@ class Maze extends Component {
       randomPoint.x = this.RNG(0,this.maze_w);
       randomPoint.y = this.RNG(0,this.maze_h);
 
+      
+      
       return randomPoint;
     }
 
@@ -50,6 +56,12 @@ class Maze extends Component {
         prevTileData = this.RandomStartPoint();
         xoff = 0;
         yoff = 0;
+        this.setState({
+          pos: {
+            x: prevTileData.x,
+            y: prevTileData.y
+          }
+        })
       } else {
         let dir = this.ChooseTileDirection();
         prevTileData = this.tileData[ndx - 1];
@@ -164,8 +176,6 @@ class Maze extends Component {
     this.maze = document.querySelector('#maze');
     this.maze_w = this.maze.offsetWidth;
     this.maze_h = this.maze.offsetHeight;
-    console.log(this.maze_w);
-    console.log(this.maze_h);
 
     //tile size based on maze width (screen width)
     if (this.maze_w >= 1200) this.tileSize = 50;
@@ -173,25 +183,68 @@ class Maze extends Component {
     else if (this.maze_w >= 600) this.tileSize = 25;
     else this.tileSize = 20;
 
-    console.log(this.tileSize);
-
     let maxTilesHor = Math.floor(this.maze_w / this.tileSize);
     let maxTilesVer = Math.floor(this.maze_h / this.tileSize);
     this.numTiles = Math.floor((maxTilesHor * maxTilesVer) * .65);
-    console.log(this.numTiles);
-    console.log(maxTilesHor);
-    console.log(maxTilesVer);
-
 
     this.AddTileData();
     
     this.forceUpdate(); //shows tiles
+
     this.AddWalls();
+  }
+
+  movePlayer = (evt) => {
+    console.log(evt.key);
+    let px = this.state.pos.x;
+    let py = this.state.pos.y;
+    switch(evt.key) {
+      case "ArrowUp":
+        //check tile in that direction before setting state
+        if (this.TileDataExists({x: px, y: py - 50}))
+          this.setState(prevState => ({
+            pos: {
+              x: prevState.pos.x,
+              y: prevState.pos.y - 50 //move player up one tile
+            }
+          }));
+        break;
+      case "ArrowDown":
+        if (this.TileDataExists({x: px, y: py + 50}))
+          this.setState(prevState => ({
+            pos: {
+              x: prevState.pos.x,
+              y: prevState.pos.y + 50 //move player up one tile
+            }
+          }));
+        break;
+      case "ArrowLeft":
+        if (this.TileDataExists({x: px - 50, y: py}))
+          this.setState(prevState => ({
+            pos: {
+              x: prevState.pos.x - 50,
+              y: prevState.pos.y //move player up one tile
+            }
+          }));
+        break;
+      case "ArrowRight":
+        if (this.TileDataExists({x: px + 50, y: py}))
+          this.setState(prevState => ({
+            pos: {
+              x: prevState.pos.x + 50,
+              y: prevState.pos.y //move player up one tile
+            }
+          }));
+        break;
+      default:
+        console.log(`${evt.key} not a valid key`)
+    }
   }
 
   render() {
     return (
       <>
+        {/* <Maze tileData={this.tileData} tileSize={this.tileSize}/> */}
         {this.tileData.map( (t, index) => {
           return( <Tile x={t.x} 
                         y={t.y} 
@@ -200,9 +253,11 @@ class Maze extends Component {
                         walls={t.w}
                         key={`t${index}`} /> )
         })}
+        
+        <Player {...this.state} move={this.movePlayer}/>
       </>
     );
   }
 }
 
- export default Maze;
+ export default MazeManager;
