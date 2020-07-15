@@ -7,7 +7,9 @@ import '../css/Maze.css';
 function App() {
   return (
     <div className="App">
-      <MazeManager />
+      <div id="maze">
+        <MazeManager />
+      </div>  
     </div>
   );
 }

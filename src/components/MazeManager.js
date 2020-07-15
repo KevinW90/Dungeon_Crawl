@@ -191,7 +191,7 @@ class Maze extends Component {
 
   render() {
     return (
-      <div id="maze">
+      <>
         {this.tileData.map( (t, index) => {
           return( <Tile x={t.x} 
                         y={t.y} 
@@ -200,7 +200,7 @@ class Maze extends Component {
                         walls={t.w}
                         key={`t${index}`} /> )
         })}
-      </div>
+      </>
     );
   }
 }
